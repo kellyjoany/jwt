@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "nome": "kelly",
+    "especialidade": "JavaScript",
+    "signo": "peixes",
+    "cpf": 1111111111
+  },
+  {
+    "id": 2,
+    "nome": "roberta",
+    "especialidade": "JavaScript",
+    "signo": "cancer",
+    "cpf": 22222222222
+  },
+  {
+    "id": 3,
+    "nome": "bia",
+    "especialidade": "rainha dos código tudo",
+    "signo": "libra",
+    "cpf": 33333333333
+  },
+  {
+    "id": 4,
+    "nome": "Debora",
+    "especialidade": "Javascript",
+    "signo": "capricornio",
+    "cpf": 44444444444
+  }
+]
