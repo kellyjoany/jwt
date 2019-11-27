@@ -1,17 +1,28 @@
 const jwt = require('jsonwebtoken');
 const authConfig = require ('../config/auth');
 const alunas = require("../model/alunas.json");
+const bcrypt = require("bcrypt");
 
-exports.getToken = (req, res) => {
-  const { name } = req.body;
+function checkPassword(passwordEntry, password) {
+  return bcrypt.compareSync(passwordEntry, password);
+}
+
+exports.accessToken = (req, res) => {
+  const { name, password: passwordEntry } = req.body;
   const user = alunas.find(e => e.nome == name)
-
+  
   if (!user) {
     return res.status(401).json({ error: 'user not found' });
   }
 
-  const {id, nome} = user;
-  
+  const {id, nome, hashPass } = user;
+
+  try {
+    checkPassword(passwordEntry, hashPass);
+  } catch (e) {
+    return res.status(401).json({ error: 'password does not match' });
+  }
+
   try {
     return res.json({
       user: {
@@ -26,39 +37,3 @@ exports.getToken = (req, res) => {
     return res.status(401).json({ error: 'erro' });
   }
 }
-/*  
-class SessionController {
-  store(req, res) {
-    const schema = Yup.object().shape({
-      email: Yup.string().email().required(),
-      password: Yup.string().required(),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      res.status(400).json({ error: 'Validations fails' });
-    } 
-
-    const { nome } = req.body;
-    const user = alunas.find(e => e.nome == nome)
-
-    if (!user) {
-      return res.status(401).json({ error: 'user not found' });
-    }
-
-    try {
-      return res.json({
-        user: {
-          nome,
-        },
-        token: jwt.sign({ id }, authConfig.secret, {
-          expiresIn: authConfig.expiresIn,
-        }),
-      });
-    } catch (e) {
-      return res.status(401).json({ error: 'erro' });
-    }
-  }
-}
-
-export default new SessionController();
-*/

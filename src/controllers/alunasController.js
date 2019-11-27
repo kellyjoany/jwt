@@ -1,8 +1,15 @@
 const alunas = require("../model/alunas.json")
 const fs = require('fs');
+const bcrypt = require("bcrypt");
+const bcryptSalt = 8;
 
+/*router.post("/signup", (req, res, next) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  const salt     = bcrypt.genSaltSync(bcryptSalt);
+  const hashPass = bcrypt.hashSync(password, salt);
+*/
 exports.get = (req, res) => {
-  console.log(req.url)
   res.status(200).send(alunas)
 }
 
@@ -62,18 +69,23 @@ function calcularIdade(anoDeNasc, mesDeNasc, diaDeNasc) {
   return idade
 }
 
-exports.post = (req, res) => { 
-  const { nome, dateOfBirth, nasceuEmSp, id, livros } = req.body;
-  alunas.push({ nome, dateOfBirth, nasceuEmSp, id, livros });
-
-  fs.writeFile("./src/model/alunas.json", JSON.stringify(alunas), 'utf8', function (err) {
-    if (err) {
-      return res.status(500).send({ message: err });
-    }
-    console.log("The file was saved!");
-  }); 
-
-  return res.status(201).send(alunas);
+exports.post = async (req, res) => { 
+  const { nome, password, dateOfBirth, nasceuEmSp, id, livros } = req.body;
+  const salt = bcrypt.genSaltSync(bcryptSalt);
+  try {
+    const hashPass = await bcrypt.hashSync(password, salt);
+    alunas.push({ nome, hashPass, dateOfBirth, nasceuEmSp, id, livros });
+  
+    fs.writeFile("./src/model/alunas.json", JSON.stringify(alunas), 'utf8', function (err) {
+      if (err) {
+        return res.status(500).send({ message: err });
+      }
+      console.log("The file was saved!");
+    }); 
+    return res.status(201).send(alunas); 
+  } catch (e) {
+    return res.status(401).json({ error: 'erro' });
+  }
 }
 
 exports.postBooks = (req, res) => {
